@@ -1,0 +1,141 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique @db.VarChar(50)
+  email     String   @unique
+  password  String   @db.VarChar(50)
+  companyId Int?     @map("company")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  company              Company?              @relation(fields: [companyId], references: [id])
+  premiumSubscriptions PremiumSubscription[]
+
+  createdJams Jam[] @relation("JamCreator")
+  wonJams     Jam[] @relation("JamWinner")
+
+  createdTeams    Team[]
+  teamMemberships TeamMember[]
+
+  @@map("users")
+}
+
+model Company {
+  id            Int    @id @default(autoincrement())
+  corporateName String @map("corporate_name") @db.VarChar(100)
+  businessName  String @map("business_name") @db.VarChar(100)
+  cnpj          String @db.VarChar(18)
+
+  users User[]
+
+  @@map("companies")
+}
+
+model Plan {
+  id            Int     @id @default(autoincrement())
+  duration      Int
+  fullPrice     Decimal @map("full_price")
+  pricePerMonth Decimal @map("price_per_month")
+
+  subscriptions PremiumSubscription[]
+
+  @@map("plans")
+}
+
+model PremiumSubscription {
+  id           Int      @id @default(autoincrement())
+  planId       Int      @map("plan")
+  userId       Int      @map("user")
+  subscribedAt DateTime @default(now()) @map("subscribed_at")
+  expiresAt    DateTime @map("expires_at")
+
+  plan Plan @relation(fields: [planId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("premium_subscriptions")
+}
+
+model Jam {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(200)
+  description String? @db.VarChar(1000)
+  reward      String? @db.VarChar(500)
+
+  registrationStartsAt DateTime @map("registration_starts_at")
+  registrationEndsAt   DateTime @map("registration_ends_at")
+
+  jamStart DateTime @map("jam_start")
+  jamEnd   DateTime @map("jam_end")
+
+  createdById Int  @map("created_by")
+  winnerId    Int? @map("winner_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  author User  @relation("JamCreator", fields: [createdById], references: [id])
+  winner User? @relation("JamWinner", fields: [winnerId], references: [id])
+
+  teams Team[]
+
+  @@map("jams")
+}
+
+model Team {
+  id    Int    @id @default(autoincrement())
+  name  String @db.VarChar(50)
+  jamId Int    @map("jam")
+
+  registeredAt DateTime @default(now()) @map("registered_at")
+  createdById  Int      @map("created_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  jam     Jam  @relation(fields: [jamId], references: [id])
+  creator User @relation(fields: [createdById], references: [id])
+
+  members  TeamMember[]
+  projects Project[]
+
+  @@map("teams")
+}
+
+model TeamMember {
+  teamId   Int      @map("team")
+  memberId Int      @map("member")
+  addedAt  DateTime @default(now()) @map("added_at")
+
+  team   Team @relation(fields: [teamId], references: [id])
+  member User @relation(fields: [memberId], references: [id])
+
+  @@id([teamId, memberId])
+  @@map("team_members")
+}
+
+model Project {
+  id          Int     @id @default(autoincrement())
+  title       String  @db.VarChar(200)
+  description String? @db.VarChar(2000)
+  cover       String? @db.VarChar(1000)
+  teamId      Int     @map("created_by")
+
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@map("projects")
+}
