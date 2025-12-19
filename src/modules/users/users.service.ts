@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
@@ -27,7 +27,7 @@ export class UsersService {
     if (id) conditions.push({ id });
     if (email) conditions.push({ email });
     const result = await this.prisma.user.findFirst({ where: { id } });
-    if (!result) throw new Error();
+    if (!result) throw new NotFoundException();
     return result;
   }
 
