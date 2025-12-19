@@ -3,6 +3,7 @@ export class CreateUserDto {
     private _username: string,
     private _email: string,
     private _password: string,
+    private _cpf: string,
   ) {}
 
   public get username() {
@@ -18,5 +19,13 @@ export class CreateUserDto {
 
   public set password(newPassword: string) {
     this._password = newPassword;
+  }
+
+  public get cpf() {
+    return this._cpf;
+  }
+
+  public set cpf(newCpf: string) {
+    this._cpf = newCpf;
   }
 }

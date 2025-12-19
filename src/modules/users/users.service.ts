@@ -11,11 +11,12 @@ export class UsersService {
     const salt: string = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(dto.password, salt);
 
-    await this.prisma.user.create({
+    return await this.prisma.user.create({
       data: {
         email: dto.email,
         username: dto.username,
         password: hashedPassword,
+        cpf: dto.cpf,
       },
     });
   }
