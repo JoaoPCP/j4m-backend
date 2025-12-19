@@ -8,8 +8,6 @@ import { Jam } from '@prisma/client';
 export class J4msService {
   constructor(private readonly prisma: PrismaService) {}
   async create(createJ4mDto: CreateJ4mDto, userId: number): Promise<Jam> {
-    console.log(createJ4mDto);
-
     const result = await this.prisma.jam.create({
       data: { ...createJ4mDto, createdById: userId },
     });
