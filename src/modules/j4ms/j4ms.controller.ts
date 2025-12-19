@@ -28,6 +28,17 @@ export class J4msController {
   findAll() {
     return this.j4msService.findAll();
   }
+  @UseGuards(AuthGuard)
+  @Get('created') // Rota: GET /j4ms/created
+  findMyCreatedJams(@Request() req) {
+    return this.j4msService.findCreatedByUser(req.user.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('participating') // Rota: GET /j4ms/participating
+  findMyParticipatingJams(@Request() req) {
+    return this.j4msService.findParticipatingByUser(req.user.id);
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

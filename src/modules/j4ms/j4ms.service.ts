@@ -47,4 +47,27 @@ export class J4msService {
     });
     return { id, name: deletedJamName };
   }
+
+  async findCreatedByUser(userId: number): Promise<Jam[]> {
+    return this.prisma.jam.findMany({
+      where: {
+        createdById: userId,
+      },
+    });
+  }
+  async findParticipatingByUser(userId: number): Promise<Jam[]> {
+    return this.prisma.jam.findMany({
+      where: {
+        teams: {
+          some: {
+            members: {
+              some: {
+                memberId: userId,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
 }
