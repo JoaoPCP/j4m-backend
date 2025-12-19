@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from 'src/modules/users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
@@ -10,12 +10,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     UsersModule,
     JwtModule.registerAsync({
       global: true,
-      imports: [ConfigModule], // Garante acesso ao ConfigModule
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'), // Pega a senha de forma segura
+        secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '7d' },
       }),
-      inject: [ConfigService], // Injeta o serviço para ler o .env
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
