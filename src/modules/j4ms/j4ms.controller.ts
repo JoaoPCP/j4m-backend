@@ -12,7 +12,7 @@ import {
 import { J4msService } from './j4ms.service';
 import { CreateJ4mDto } from './dto/create-j4m.dto';
 import { UpdateJ4mDto } from './dto/update-j4m.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/modules/auth/auth.guard';
 
 @Controller('j4ms')
 export class J4msController {
