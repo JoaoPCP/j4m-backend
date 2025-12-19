@@ -17,19 +17,20 @@ model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique @db.VarChar(50)
   email     String   @unique
-  password  String   
+  password  String
   companyId Int?     @map("company")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  cpf       String
 
-  company              Company?              @relation(fields: [companyId], references: [id])
-  premiumSubscriptions PremiumSubscription[]
+  company Company? @relation(fields: [companyId], references: [id])
 
   createdJams Jam[] @relation("JamCreator")
   wonJams     Jam[] @relation("JamWinner")
 
   createdTeams    Team[]
   teamMemberships TeamMember[]
+  subscriptions   Subscription[]
 
   @@map("users")
 }
@@ -43,30 +44,6 @@ model Company {
   users User[]
 
   @@map("companies")
-}
-
-model Plan {
-  id            Int     @id @default(autoincrement())
-  duration      Int
-  fullPrice     Decimal @map("full_price")
-  pricePerMonth Decimal @map("price_per_month")
-
-  subscriptions PremiumSubscription[]
-
-  @@map("plans")
-}
-
-model PremiumSubscription {
-  id           Int      @id @default(autoincrement())
-  planId       Int      @map("plan")
-  userId       Int      @map("user")
-  subscribedAt DateTime @default(now()) @map("subscribed_at")
-  expiresAt    DateTime @map("expires_at")
-
-  plan Plan @relation(fields: [planId], references: [id])
-  user User @relation(fields: [userId], references: [id])
-
-  @@map("premium_subscriptions")
 }
 
 model Jam {
@@ -138,4 +115,34 @@ model Project {
   team Team @relation(fields: [teamId], references: [id])
 
   @@map("projects")
+}
+
+model SubscriptionPlan {
+  id           Int     @id @default(autoincrement())
+  name         String  @db.VarChar(100)
+  description  String? @db.VarChar(500)
+  priceCents   Int     @map("price_cents")
+  durationDays Int     @map("duration_days")
+
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  subscriptions Subscription[]
+
+  @@map("subscription_plans")
+}
+
+model Subscription {
+  id                  Int       @id @default(autoincrement())
+  userId              Int       @map("user")
+  planId              Int       @map("plan")
+  startedAt           DateTime  @default(now()) @map("started_at")
+  expiresAt           DateTime? @map("expires_at")
+  isActive            Boolean   @default(true) @map("is_active")
+  asaasSubscriptionId String    @map("asaas_integration")
+  asaasCustomerId     String    @map("asaas_customer_id")
+
+  user User             @relation(fields: [userId], references: [id])
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@map("subscriptions")
 }
