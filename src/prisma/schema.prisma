@@ -106,9 +106,10 @@ model TeamMember {
 model Project {
   id          Int     @id @default(autoincrement())
   title       String  @db.VarChar(200)
+  url         String  
   description String? @db.VarChar(2000)
   cover       String? @db.VarChar(1000)
-  teamId      Int     @map("created_by")
+  teamId      Int     @map("created_by") @unique
 
   submittedAt DateTime @default(now()) @map("submitted_at")
 
