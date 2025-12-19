@@ -10,12 +10,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     UsersModule,
     JwtModule.registerAsync({
       global: true,
-      imports: [ConfigModule], // Garante acesso ao ConfigModule
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'), // Pega a senha de forma segura
+        secret: configService.get<string>('JWT_SECRET'),
         signOptions: { expiresIn: '7d' },
       }),
-      inject: [ConfigService], // Injeta o serviço para ler o .env
+      inject: [ConfigService],
     }),
   ],
   controllers: [AuthController],
