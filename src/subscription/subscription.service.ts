@@ -2,12 +2,12 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { firstValueFrom } from 'rxjs';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class SubscriptionService {
-  private readonly baseUrl = '';
-  private readonly apiKey = '';
-
+  private readonly baseUrl = 'https://sandbox.asaas.com/api/v3';
+  private readonly apiKey = 'SUA_CHAVE_DE_API_ASAAS_AQUI';
   constructor(
     private readonly httpService: HttpService,
     private readonly prisma: PrismaService,
@@ -65,6 +65,7 @@ export class SubscriptionService {
 
       return subscriptionRecord;
     } catch (error) {
+      console.log(error);
       throw new Error('Failed to create subscription for user');
     }
   }
@@ -92,9 +93,14 @@ export class SubscriptionService {
       const response = await firstValueFrom(
         this.httpService.post(url, body, { headers }),
       );
+      console.log(response.data);
       return response.data;
     } catch (error) {
-      throw new Error('Failed to create Asaas subscription');
+      const axiosError = error as AxiosError;
+
+      const responseData = axiosError.response?.data;
+      console.error('Erro ao criar assinatura Asaas:', responseData);
+      throw new Error('Failed to create Asaas subscription', error);
     }
   }
 
@@ -123,8 +129,10 @@ export class SubscriptionService {
         }),
       );
 
-      return response.data;
+      console.log(response.data);
+      return response.data.id;
     } catch (error) {
+      console.log(error);
       throw new Error('Failed to create Asaas client');
     }
   }
@@ -140,8 +148,10 @@ export class SubscriptionService {
           headers,
         }),
       );
-      return response.data;
+      console.log(response.data);
+      return response.data.data[0];
     } catch (error) {
+      console.log(error);
       throw new Error('Failed to fetch Asaas client by CPF');
     }
   }
